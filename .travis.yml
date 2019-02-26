@@ -1,0 +1,25 @@
+---
+branches:
+  only:
+    - master
+
+env:
+  global:
+    # DOCKER_EMAIL
+    - secure: "QnaZNB8ir0McBFVppGz8nyPh2N/tiYcpWn/KoEmC2lp7EdHKoUwsnp+R0AZCjFQc0FUu3MfNIjSMOWNIjK+dzGt+gvCjlfZ6/0Vbs/pySCWQnLLZ5ovygrdjfD2Ik8nkEOgRQhfVNKND4eKXxtmSLXC9z1a7I2CFw5k22WILK28FB1fgeVUvV+LPLQQw7LYpmhYfo7nYE2Ma/j3BMGLOwmnf7jZ3sU4lDg24iDToV/q+B2EOxYmY2uTSmiwMw4KW0wN/kCnB67dXIAt9oxUY1xVrbFdYSIhvlf9r08YYcq1ASHIIBsQc+wcxDdmWLvvHxtIde56OXoFWz7i6Oy5P1AMtdnxzR4237TIRJbIa7UwMuycrqxHYpKN5n5AP0skTZyVFDBijCIbphqikO89u86fVKw48OyVDGMmSjskMOcywNdj3+OVrNi3qiSiOwV0IhcYY1xntdMHYGjVUWdvTZqkoBBfsFGa0z3AWUQYhDehHHKP2W4m/Ah5XCtdOiswM2vBwQID6y58aLf5q4jUrcoeGOQssXXZVpXTjJyDLHbfzSY05Y81xBe0bC0/2/uWNHZeRzxeXAa/myY0PhrlpM67gMh8NIw75wRB/qpZQ7NCz07mGr+c58vRAwfsme4rcq8O3XifnssO2KsIyG7hRzimjdHQk9ri3r23ks7fbKRI="
+    # DOCKER_USER
+    - secure: "hlqbSB8HmoBuypo7q/8kyMs+0bzKqrjOV6nGmvgN15LEk5GxcROSHc8p9Hbk3SQQTG9rVgyBbDFNTIb2IB3/plI0uXlbngfiZ0uww2v+l4mnTgXoW70vAdasao/c8PaYPj+zSvgSt+Gy1ZCDFp+EK/sLD6xvbgy4Hun59tkHZcE1rTc0UNmPIaqEi6MQQp518+oqKJM1+3fzFdODEUvgFIpD3e9R4BGwWU2fSEeeFu3b02x42Ro1E/SAH0azwkYZE7CSe+tVUQvfGbMphI/Dkd/TSf3iQzflBYct6gZ3DNUET0a0jVJn7Gf7Plt1d6jB8ZO5G/Rr4zi4ocWp9iSrADrv5IXHXHr8MFD9W9gyGQtgp0vPFaENgSNFuGUCYtd3NXCi/d1BgsoEDzsLTfQF6wK/4nPoqxHd8knD7pBj49MS1jl1SAKUfGKYAduxjVfqvzzFzeBpWa8fO5nWK9K40WWfKN1lqUXjgZjN3DEVM9m1DeoYHPLLhUDfoNumLGuOW8/1ylS+2fTsmMkq//mOfD/4xoGde9qY3Ka62KQ8pcEh5+QOlZV59x6VPtTH28PUwo5IfhKqqMs3eRq+plXEncb1fOmUdLFbHEqI3YBPvPYDRA3GHIuw9MeqrA/Y+WhLtP7T81RnjSSidtP3wbbYcWHh92FI+nB50FLFfGt+l1k="
+    # DOCKER_PASS
+    - secure: "mJnmGZGX3D73QgGlHXn8OyazkPh2JkuupRPRX6DCYS6i7Jw+OojCVQcv1vYjwtIR16UpbS/47hQnSTQFIxlBEsyBRi/FOCyK8IahmlYNHWSqMAgX9fApt0z6k4VxvvVmrmOu1pJO418mz6/rBhg6QKHtQ6zo/5l/jpvtLI7QZYFlOYQTpEYyEQV6mGJezZrN2Fs6lwHmeI2H/eCvbKLFSX93hGf+suVvXH58pylCdZQsiP5HAUID6C6xDStUFARDm/4Sza0dzVwHZLw66cxCh7NKvrbU+SJXXvpMwcsgiJx9Jvf/P4xn6IZc4C5tioKwa7SpTaSWq2J4UVqRFN88b9bwR12dosQNNEr3/QWY1LmxwbyYsf/VyTVbBVaa50rLfozUEytTi2AFTkTMTMP2uCyFtPsIeNeSfRjOlYSW39bmu+Edixzj2bSFztKP7UlBdigJjN44neCxzLzl3dXPcdrmfm3udOSIBmy753DpeveHn9nkydNOmcDrtpVFLR5ooZykR+ivA6fmRKS4nPjP5F25PLcKg2jZI/438ycQrTMHBJ1KrL0kB3j0d0qj6q4Qjltl2MD7h6ik6XQgQ2SHMwvz7b8OuO0X08S2cDmgTf7eMSVzYglWkPCF8iZ81dUKePsMELWMeHBN/YqrmXGgTr5Upt8u/01L1Gldqz2LBmQ="
+    - DOCKER_REPO=spreadspace/icecast
+
+script:
+  ### pull current images to potentially use docker build cache
+  - docker pull $DOCKER_REPO:latest
+  ### build the new images
+  - docker build -t $DOCKER_REPO:latest .
+  - docker tag $DOCKER_REPO:latest $DOCKER_REPO:$TRAVIS_BUILD_NUMBER
+  ### push to docker-hub
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - docker push $DOCKER_REPO:$TRAVIS_BUILD_NUMBER
+  - docker push $DOCKER_REPO:latest
